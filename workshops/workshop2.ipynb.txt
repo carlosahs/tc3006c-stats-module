@@ -1,0 +1,1416 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "051d60ce-5c00-4495-9567-103698582c0a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from symbulate import *\n",
+    "#'exec(%matplotlib inline)' \n",
+    "import matplotlib\n",
+    "\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "06955704-b1f4-49d2-9db4-ac61676a926e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# clear the plot space:\n",
+    "plt.clf()\n",
+    "# Define the probability type of function as uniform (probability space)\n",
+    "P = Uniform(0,40)\n",
+    "# Define X as a random variable of the type P (uniform)\n",
+    "X =RV(P)\n",
+    "# Simulate the values of X and save the in the x array: \n",
+    "x=X.sim(10000)\n",
+    "x.plot()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "62d6b8fb-b22a-4c25-94f1-cb4d7c9a9f26",
+   "metadata": {},
+   "source": [
+    "# CHALLENGE\n",
+    "1. CALCULATE THE MEAN AND STANDARD DEVIATION OF THIS SIMULATED UNIFORM x VARIABLE. HOW CLOSE WERE THESE MEAN AND STANDARD DEVIATION FROM THE THEORETICAL MEAN AND STANDARD DEVIATION?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "484d299a-f271-4b5c-9442-8f1f16d39c9b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "11.581071793474564 20.018844346745713\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_std = x.std()\n",
+    "x_mu = x.mean()\n",
+    "\n",
+    "print(x_std, x_mu)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c351cbed-4e3a-41de-862b-42ac11619158",
+   "metadata": {},
+   "source": [
+    "The theoretical mean and standard deviation are calculated as follows:\n",
+    "$$\n",
+    "\\text{E}(x) = \\frac{a + b}{2}, \\sigma(x) = \\sqrt{\\frac{(b - a)^2}{12}}\n",
+    "$$\n",
+    "where $a$ is the lower bound and $b$ is the upper bound of our distribution.\n",
+    "\n",
+    "Because $a = 0$ and $b = 40$, the theoretical values are\n",
+    "$$\n",
+    "\\text{E}(x) = \\frac{0 + 40}{2} = 20, \\sigma(x) = \\sqrt{\\frac{(40 - 0)^2}{12}} \\approx 11.54\n",
+    "$$\n",
+    "\n",
+    "Therefore, tt can be concluded that the theoretical values are very close to the simulated values."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cef519e2-f019-4056-8c63-3975e29a69b4",
+   "metadata": {},
+   "source": [
+    "2. INTERPRET THE ABOVE HISTOGRAM. WHAT DO YOU SEE? EXPLAIN WITH YOUR WORDS.\n",
+    "\n",
+    "The above histogram roughly represents a uniform probability distribution, which is characterized by its rectangular shape.\n",
+    "\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "9e800e2a-d9fc-4726-ac74-5b793e8406a8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Define the probability space as a vector of 25 uniform random numbers:\n",
+    "P = Uniform(0,40) ** 25\n",
+    "# Define XVECTOR as a vector of random variables with 25 random values \n",
+    "XVECTOR =RV(P)\n",
+    "# Simulate 10,000 vectors to get a matrix  \n",
+    "xmatrix=XVECTOR.sim(10000)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "1016cb81-cca0-49a0-bcf1-3d0934fea225",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "\n",
+       "    <table>\n",
+       "      <thead>\n",
+       "        <th width=\"10%\">Index</th>\n",
+       "        <th width=\"90%\">Result</th>\n",
+       "      </thead>\n",
+       "      <tbody>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>0</td><td>(33.17056185436942, 16.914290947817292, 3.2927846261607074, 20.22897481098324, 30.91651516669892, .....</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>1</td><td>(4.024777445528365, 32.32824063009292, 33.17393531971899, 25.433367881817304, 25.232029300319986, .....</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>2</td><td>(23.359820786764832, 14.801038965437776, 9.56235445477311, 32.639898323080374, 22.404663877202697, ....</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>3</td><td>(22.679746219725438, 28.800941392672232, 8.134301709001779, 14.349977347571574, 19.56807628351556, ....</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>4</td><td>(38.553860446310765, 26.952908413209677, 31.081179237112288, 14.205773239522888, 37.6608466029081, ....</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>5</td><td>(31.659708671445095, 4.330707590159157, 33.06504977172592, 18.08040884301446, 10.58376083558031, ......</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>6</td><td>(19.961891275936065, 37.07002396088361, 36.54779140348231, 17.63903248012909, 15.54695951370011, ......</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>7</td><td>(38.23782490712621, 29.687380303979868, 22.842396858378862, 27.604563629675795, 36.91271736316193, ....</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>8</td><td>(15.789137158276393, 22.353687231434144, 2.3838414953014375, 30.550691302996444, 12.067642171128782,...</td>\n",
+       "        </tr>\n",
+       "        <tr><td>...</td><td>...</td></tr>\n",
+       "        <tr>\n",
+       "          <td>9999</td><td>(0.3217654795307112, 35.6064714060408, 22.120507592141706, 17.54969731349682, 3.3706785949974583, .....</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "      </tbody>\n",
+       "    </table>\n",
+       "        "
+      ],
+      "text/plain": [
+       "Index Result\n",
+       "0     (33.17056185436942, 16.914290947817292, 3.2927846261607074, 20.22897481098324, 30.91651516669892, ..., 6.408060993749087)\n",
+       "1     (4.024777445528365, 32.32824063009292, 33.17393531971899, 25.433367881817304, 25.232029300319986, ..., 31.89987987911472)\n",
+       "2     (23.359820786764832, 14.801038965437776, 9.56235445477311, 32.639898323080374, 22.404663877202697, ..., 34.505728923341614)\n",
+       "3     (22.679746219725438, 28.800941392672232, 8.134301709001779, 14.349977347571574, 19.56807628351556, ..., 1.202305684903795)\n",
+       "4     (38.553860446310765, 26.952908413209677, 31.081179237112288, 14.205773239522888, 37.6608466029081, ..., 10.119088110468141)\n",
+       "5     (31.659708671445095, 4.330707590159157, 33.06504977172592, 18.08040884301446, 10.58376083558031, ..., 18.15226082764667)\n",
+       "6     (19.961891275936065, 37.07002396088361, 36.54779140348231, 17.63903248012909, 15.54695951370011, ..., 24.666966234994128)\n",
+       "7     (38.23782490712621, 29.687380303979868, 22.842396858378862, 27.604563629675795, 36.91271736316193, ..., 14.370870826402978)\n",
+       "8     (15.789137158276393, 22.353687231434144, 2.3838414953014375, 30.550691302996444, 12.067642171128782, ..., 1.79578211152569)\n",
+       "....  .........................................................................................................................\n",
+       "9999  (0.3217654795307112, 35.6064714060408, 22.120507592141706, 17.54969731349682, 3.3706785949974583, ..., 6.866578484818779)"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "xmatrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "9c28b000-abde-41d7-ba1d-9b63fa300a26",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "\n",
+       "    <table>\n",
+       "      <thead>\n",
+       "        <th width=\"10%\">Index</th>\n",
+       "        <th width=\"90%\">Result</th>\n",
+       "      </thead>\n",
+       "      <tbody>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>0</td><td>22.140117837530852</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>1</td><td>21.147761754288585</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>2</td><td>16.786932423251933</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>3</td><td>16.44333879963579</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>4</td><td>19.856930820222914</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>5</td><td>15.132458513021302</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>6</td><td>21.656309973758496</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>7</td><td>19.76733933187908</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>8</td><td>21.6054481130805</td>\n",
+       "        </tr>\n",
+       "        <tr><td>...</td><td>...</td></tr>\n",
+       "        <tr>\n",
+       "          <td>9999</td><td>19.106823533335568</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "      </tbody>\n",
+       "    </table>\n",
+       "        "
+      ],
+      "text/plain": [
+       "Index Result\n",
+       "0     22.140117837530852\n",
+       "1     21.147761754288585\n",
+       "2     16.786932423251933\n",
+       "3     16.44333879963579\n",
+       "4     19.856930820222914\n",
+       "5     15.132458513021302\n",
+       "6     21.656309973758496\n",
+       "7     19.76733933187908\n",
+       "8     21.6054481130805\n",
+       "....  ..................\n",
+       "9999  19.106823533335568"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# The 2nd parameter is the mathematical operation applied to each row of the random vector\n",
+    "# Simulate 10,000 means of each random vector of 25 uniform distributed numbers: \n",
+    "xmean = RV(P,mean).sim(10000)\n",
+    "xmean"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "645d86a7-ac93-4993-bf93-5985b1af60f2",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "plt.clf()\n",
+    "xmean.plot()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ad86cc21-cdd8-40a3-8018-f89af22f0dc5",
+   "metadata": {},
+   "source": [
+    "# CHALLENGE\n",
+    "\n",
+    "1. CALCULATE THE MEAN AND STANDARD DEVIATION OF THE xmean VARIABLE. HOW SIMILAR OR DIFFERENT ARE THESE VALUES FROM THE MEAN AND STANDARD DEVIATION OF x?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "e38d7ca4-02b7-4af1-ad33-7f4647777b97",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "20.039132652894796 20.018844346745713\n",
+      "2.279476949788704 11.581071793474564\n"
+     ]
+    }
+   ],
+   "source": [
+    "xmean_mu = xmean.mean()\n",
+    "xmean_std = xmean.std()\n",
+    "\n",
+    "print(xmean_mu, x_mu)\n",
+    "print(xmean_std, x_std)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "51b35aa7-b162-4c5f-98a2-6e12e62b0ad5",
+   "metadata": {},
+   "source": [
+    "The values from the mean are very similar but the values from the standard deviation differ by a factor of five."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8ec8f6b5-7e90-4042-ae21-494e1489a08b",
+   "metadata": {},
+   "source": [
+    "2. WHAT DO YOU SEE IN THE ABOVE HISTOGRAM? DOES THE HISTOGRAM OF SAMPLE MEANS OF UNIFORM RANDOM VARIABLE LOOK LIKE A UNIFORM DISTRIBUTED VARIABLE? DO YOU SEE A LOGIC? BRIEFLY EXPLAIN WHAT YOU THINK.\n",
+    "\n",
+    "Since the shape of this distribution is not rectangular, then it can be concluded that it is not a uniform probability distribution. It would be a unirform probability distribution if and only if all values within the distribution had the same probability, which is what gives the rectangular shape to such distribution."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "c931f05a-61b6-46bc-94db-20f2229f57a1",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAAYgAAAD4CAYAAAD2FnFTAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjUuMiwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8qNh9FAAAACXBIWXMAAAsTAAALEwEAmpwYAAAXH0lEQVR4nO3df7AdZ33f8fcn8o8ADhjbN4RIdiTHclJRKJhrAQXcFMZEhmAlE7nIkImdcas0QdPWlCSCdBzjJC0mDQozuC0COxi71BgHqApqhcBMmEkN6PoHtmUjI4RrS6WxjI2Jk4KR/e0fZ0UPR6urc6279xzd+37NnLm7zz57zveudM7n7rN7dlNVSJI06MdGXYAkaTwZEJKkVgaEJKmVASFJamVASJJaHTPqAmbLKaecUkuXLh11GZJ0VLn11lsfrqqJtmXzJiCWLl3K1NTUqMuQpKNKkv91qGUOMUmSWhkQkqRWBoQkqZUBIUlqZUBIkloZEJKkVgaEJKmVASFJamVASJJazZtvUkvjZOO2+w5qu/TcM0dQifT0uQchSWplQEiSWjnEJI3I4DCUQ1AaN+5BSJJauQchzYK2g9LS0c49CElSKwNCktTKISZpjjgMpaONexCSpFadBkSSVUl2JtmVZEPL8nOS3JZkf5I1A8tOS/LZJPcmuSfJ0i5rlST9qM4CIski4CrgPGAFcGGSFQPdHgAuBj7a8hQfAf6kqv4esBJ4qKtaJUkH6/IYxEpgV1XtBkhyA7AauOdAh6q6v1n2VP+KTZAcU1Xbmn6Pd1inJKlFl0NMi4EH++b3NG3DOBP4TpJPJLk9yZ80eySSpDkyrgepjwFeDbwdOBs4nd5Q1I9Isi7JVJKpffv2zW2FkjTPdRkQe4FT++aXNG3D2APcUVW7q2o/8CngrMFOVbWpqiaranJiYuJI65Uk9ekyILYDy5MsS3IcsBbYPIN1T0xy4FP/NfQdu5Akda+zgGj+8l8PbAXuBW6sqh1JrkhyPkCSs5PsAS4APpBkR7Puk/SGlz6f5C4gwAe7qlWSdLBOv0ldVVuALQNtl/VNb6c39NS27jbgRV3WJ0k6tHE9SC1JGjEDQpLUyoCQJLUyICRJrQwISVIrA0KS1MqAkCS1MiAkSa0MCElSKwNCktTKgJAktTIgJEmtOr1YnzRfbdx236hLkDrnHoQkqZV7ENKYGNwrufTcM0dUidTjHoQkqVWnAZFkVZKdSXYl2dCy/JwktyXZn2RNy/JnJ9mT5P1d1ilJOlhnAZFkEXAVcB6wArgwyYqBbg8AFwMfPcTT/CHwxa5qlCQdWpd7ECuBXVW1u6qeAG4AVvd3qKr7q+pO4KnBlZO8FHge8NkOa5QkHUKXAbEYeLBvfk/TdlhJfgz4U+Dth+m3LslUkql9+/Y97UIlSQcb14PUvw1sqao903Wqqk1VNVlVkxMTE3NUmiQtDF2e5roXOLVvfknTNoxXAK9O8tvACcBxSR6vqoMOdEuSutFlQGwHlidZRi8Y1gJvHmbFqnrLgekkFwOThoMkza3Ohpiqaj+wHtgK3AvcWFU7klyR5HyAJGcn2QNcAHwgyY6u6pEkzUyn36Suqi3AloG2y/qmt9MbepruOT4MfLiD8iRJ0xjXg9SSpBEzICRJrQwISVIrA0KS1MqAkCS1MiAkSa0MCElSKwNCktTKgJAktTIgJEmtDAhJUqtOr8UkzRcbt9036hKkOecehCSplQEhSWplQEiSWnUaEElWJdmZZFeSg+4Il+ScJLcl2Z9kTV/7i5PckmRHkjuTvKnLOiVJB+ssIJIsAq4CzgNWABcmWTHQ7QHgYuCjA+1/B/x6Vb0AWAX8WZITu6pVknSwLs9iWgnsqqrdAEluAFYD9xzoUFX3N8ue6l+xqu7rm/7fSR4CJoDvdFivJKlPl0NMi4EH++b3NG0zkmQlcBzwjZZl65JMJZnat2/f0y5UknSwsT5IneT5wHXAb1TVU4PLq2pTVU1W1eTExMTcFyhJ81iXAbEXOLVvfknTNpQkzwY+A/x+VX1plmuTJB1GlwGxHVieZFmS44C1wOZhVmz6fxL4SFXd1GGNkqRD6Cwgqmo/sB7YCtwL3FhVO5JckeR8gCRnJ9kDXAB8IMmOZvV/ApwDXJzkjubx4q5qlSQdrNNrMVXVFmDLQNtlfdPb6Q09Da53PXB9l7VJkqY31gepJUmjY0BIkloZEJKkVt4PQhpTbfeguPTcM0dQiRYq9yAkSa0MCElSKwNCktTKgJAktTIgJEmtDAhJUisDQpLUyoCQJLUyICRJrfwmtdSi7VvM0kIz1B5Ekk8keUMS9zgkaYEY9gP/PwBvBr6e5N1Jfm6YlZKsSrIzya4kG1qWn5PktiT7k6wZWHZRkq83j4uGrFOSNEuGCoiq+lxVvQU4C7gf+FyS/5nkN5Ic27ZOkkXAVcB5wArgwiQrBro9AFwMfHRg3ZOAPwBeBqwE/iDJc4f9pSRJR27oIaMkJ9P7MP+nwO3A++gFxrZDrLIS2FVVu6vqCeAGYHV/h6q6v6ruBJ4aWPcXgW1V9UhVPdq8xqpha5UkHbmhDlIn+STwc8B1wBur6lvNoo8lmTrEaouBB/vm99DbIxhG27qLW+paB6wDOO2004Z8aknSMIY9i+mDzf2lfyjJ8VX1/aqa7KCuoVTVJmATwOTkZI2qDkmaj4YdYvqjlrZbDrPOXuDUvvklTdswjmRdSdIsmHYPIslP0RvaeUaSlwBpFj0beOZhnns7sDzJMnof7mvpnQk1jK3Av+07MP064B1DritJmgWHG2L6RXoHppcA7+1r/xvgndOtWFX7k6yn92G/CLimqnYkuQKYqqrNSc4GPgk8F3hjkndV1Quq6pEkf0gvZACuqKpHZvrLSZKevmkDoqquBa5N8qtV9RczffLmuMWWgbbL+qa30wuftnWvAa6Z6WtKkmbH4YaYfq2qrgeWJnnb4PKqem/LapKkeeBwQ0zPan6e0HUhkqTxcrghpg80P981N+VIms7gRQQvPffMEVWihWDYi/W9J8mzkxyb5PNJ9iX5ta6LkySNzrDfg3hdVX0X+CV612I6A/idroqSJI3esAFxYCjqDcDHq+qxjuqRJI2JYS+18ekkXwP+L/BbSSaA73VXliRp1Ia93PcG4B8Ck1X1A+BvGbgyqyRpfpnJLUd/nt73IfrX+cgs1yNJGhPDXu77OuBngTuAJ5vmwoCQpHlr2D2ISWBFVXlJbUlaIIY9i+lu4Ke6LESSNF6G3YM4BbgnyVeA7x9orKrzO6lKkjRywwbE5V0WIUkaP0MFRFX9ZZKfAZZX1eeSPJPePR4kSfPUsNdi+mfATcAHmqbFwKeGWG9Vkp1JdiXZ0LL8+CQfa5Z/OcnSpv3YJNcmuSvJvUm8m5wkzbFhD1K/FXgl8F2Aqvo68JPTrZBkEXAVcB6wArgwyYqBbpcAj1bVGcBG4Mqm/QLg+Kp6IfBS4DcPhIckaW4MGxDfr6onDsw0X5Y73CmvK4FdVbW7WfcGDv729Wrg2mb6JuC1SdI897Oa13kG8ARNOEmS5sawAfGXSd4JPCPJucDHgf92mHUWAw/2ze9p2lr7VNV+4DHgZHph8bfAt4AHgH/fdk/qJOuSTCWZ2rdv35C/iiRpGMMGxAZgH3AX8Jv07jP9b7oqit7ex5PATwPLgH+d5PTBTlW1qaomq2pyYmKiw3IkaeEZ9iymp5J8CvhUVQ37p/pe4NS++SVNW1ufPc1w0nOAbwNvBv5Hc2HAh5L8Fb1vc+8e8rUlSUdo2j2I9Fye5GFgJ7CzuZvcZUM893ZgeZJlSY4D1gKbB/psBi5qptcANzeX83gAeE1Tw7OAlwNfG/aXkiQducMNMV1K7+yls6vqpKo6CXgZ8Mokl063YnNMYT2wFbgXuLGqdiS5IsmBb2BfDZycZBfwNnpDWdA7++mEJDvoBc2fV9WdT+P3kyQ9TZnu+ntJbgfOraqHB9ongM9W1Us6rm9ok5OTNTU1NeoydBTauO2+UZfwtF167pmjLkFHuSS3VtVk27LD7UEcOxgOAM1xiGNnozhJ0ng6XEA88TSXSZKOcoc7i+kfJGn7glqAH++gHkkzMDg85pCTZtO0AVFVXpBPkhaoYb8oJ0laYAwISVIrA0KS1MqAkCS1MiAkSa0MCElSKwNCktTKgJAktTIgJEmtDAhJUisDQpLUqtOASLIqyc4ku5JsaFl+fJKPNcu/nGRp37IXJbklyY4kdyXx4oCSNIc6C4gki+jdGe48YAVwYZIVA90uAR6tqjOAjcCVzbrHANcD/7yqXgD8AvCDrmqVJB2syz2IlcCuqtpdVU8ANwCrB/qsBq5tpm8CXpskwOuAO6vqqwBV9e2qerLDWiVJA7oMiMXAg33ze5q21j7NPawfA04GzgQqydYktyX53bYXSLIuyVSSqX379s36LyBJC9m4HqQ+BngV8Jbm568kee1gp6raVFWTVTU5MTEx1zVK0rzWZUDsBU7tm1/StLX2aY47PAf4Nr29jS9W1cNV9XfAFuCsDmuVJA3oMiC2A8uTLEtyHLAW2DzQZzNwUTO9Bri5qgrYCrwwyTOb4PhHwD0d1ipJGnC4e1I/bVW1P8l6eh/2i4BrqmpHkiuAqaraDFwNXJdkF/AIvRChqh5N8l56IVPAlqr6TFe1SpIO1llAAFTVFnrDQ/1tl/VNfw+44BDrXk/vVFdJ0giM60FqSdKIGRCSpFYGhCSplQEhSWrV6UFqaRxt3HbfqEuQjgruQUiSWhkQkqRWDjFJ88jg8Nml5545oko0H7gHIUlqZUBIkloZEJKkVgaEJKmVASFJamVASJJaGRCSpFadBkSSVUl2JtmVZEPL8uOTfKxZ/uUkSweWn5bk8SRv77JOSdLBOguIJIuAq4DzgBXAhUlWDHS7BHi0qs4ANgJXDix/L/Dfu6pRknRoXe5BrAR2VdXuqnoCuAFYPdBnNXBtM30T8NokAUjyy8A3gR0d1ihJOoQuA2Ix8GDf/J6mrbVPVe0HHgNOTnIC8HvAu6Z7gSTrkkwlmdq3b9+sFS5JGt+D1JcDG6vq8ek6VdWmqpqsqsmJiYm5qUySFoguL9a3Fzi1b35J09bWZ0+SY4DnAN8GXgasSfIe4ETgqSTfq6r3d1ivJKlPlwGxHVieZBm9IFgLvHmgz2bgIuAWYA1wc1UV8OoDHZJcDjxuOEjS3OosIKpqf5L1wFZgEXBNVe1IcgUwVVWbgauB65LsAh6hFyKSpDHQ6f0gqmoLsGWg7bK+6e8BFxzmOS7vpDhJ0rS8YZDmPe9BLT0943oWkyRpxAwISVIrh5ikecx7VOtIuAchSWplQEiSWhkQkqRWBoQkqZUBIUlqZUBIklp5muuofeHfDdfvH7+j2zqk2bYQ/2/Ps9/ZgJA0/AcbHDUfbvPCiAPHgDhgtv8hZvKGm83n6+I/yqi2zTz6IHr5A5tG8rpfOm3dSF53Rmb7veL/w1ljQMw3s/1mG+Vrz/IbeCYf0sN+sI7qg19HuVG+T2fAgJipo+QfdkE5zL/Jyx/49oyfcr588B/0e3zh5CN/Ut8DC0anAZFkFfA+ejcM+lBVvXtg+fHAR4CX0rvV6Juq6v4k5wLvBo4DngB+p6pu7rJWSfPEqPZk56HOTnNNsgi4CjgPWAFcmGTFQLdLgEer6gxgI3Bl0/4w8MaqeiG9W5Je11WdkqR2Xe5BrAR2VdVugCQ3AKuBe/r6rAYub6ZvAt6fJFV1e1+fHcAzkhxfVd/vsF7NE7fsnvmQkqSDdflFucXAg33ze5q21j5VtR94DBgcJP1V4DbDQZLm1lgfpE7yAnrDTq87xPJ1wDqA0047bQ4rk6T5r8uA2Auc2je/pGlr67MnyTHAc+gdrCbJEuCTwK9X1TfaXqCqNgGbACYnJ2tWq5fmobbht1ecPgtnNmle6nKIaTuwPMmyJMcBa4HNA3020zsIDbAGuLmqKsmJwGeADVX1Vx3WKEk6hM4CojmmsB7YCtwL3FhVO5JckeT8ptvVwMlJdgFvAzY07euBM4DLktzRPH6yq1olSQfr9BhEVW0Btgy0XdY3/T3ggpb1/gj4oy5rkyRNb6wPUkvD8LRWqRveD0KS1MqAkCS1MiAkSa0MCElSKw9SSwvc4EF+vzinA9yDkCS1MiAkSa0MCElSKwNCktTKg9Q6qvitaWnuGBCSfoRnNekAh5gkSa3cg9BYc0hJGh33ICRJrdyDkDQtj0ksXJ0GRJJVwPuARcCHqurdA8uPBz4CvJTevajfVFX3N8veAVwCPAn8i6ra2mWtGg8OKUnjo7OASLIIuAo4F9gDbE+yuaru6et2CfBoVZ2RZC1wJfCmJCvo3cP6BcBPA59LcmZVPdlVvZKG4x7FwtHlHsRKYFdV7QZIcgOwGugPiNXA5c30TcD7k6Rpv6Gqvg98s7ln9Urglg7r1Qi4x3D0a/s3NDTmhy4DYjHwYN/8HuBlh+pTVfuTPAac3LR/aWDdxYMvkGQdsK6ZfTzJziOo9xTg4SNYvyvWNTPWNTPWNTNjWtc7j6SunznUgqP6IHVVbQI2zcZzJZmqqsnZeK7ZZF0zY10zY10zs9Dq6vI0173AqX3zS5q21j5JjgGeQ+9g9TDrSpI61GVAbAeWJ1mW5Dh6B503D/TZDFzUTK8Bbq6qatrXJjk+yTJgOfCVDmuVJA3obIipOaawHthK7zTXa6pqR5IrgKmq2gxcDVzXHIR+hF6I0PS7kd4B7f3AW+fgDKZZGarqgHXNjHXNjHXNzIKqK70/2CVJ+lFeakOS1MqAkCS1WvABkWRVkp1JdiXZMOp6Dkhyf5K7ktyRZGrEtVyT5KEkd/e1nZRkW5KvNz+fOyZ1XZ5kb7Pd7kjy+jmu6dQkX0hyT5IdSf5l0z7S7TVNXaPeXj+e5CtJvtrU9a6mfVmSLzfvy481J7qMQ10fTvLNvu314rmsq6++RUluT/LpZr6b7VVVC/ZB7+D5N4DTgeOArwIrRl1XU9v9wCmjrqOp5RzgLODuvrb3ABua6Q3AlWNS1+XA20e4rZ4PnNVM/wRwH7Bi1NtrmrpGvb0CnNBMHwt8GXg5cCOwtmn/T8BvjUldHwbWjGp79dX3NuCjwKeb+U6210Lfg/jh5UCq6gngwOVA1KeqvkjvLLN+q4Frm+lrgV+ey5rgkHWNVFV9q6pua6b/BriX3lUARrq9pqlrpKrn8Wb22OZRwGvoXX4HRrO9DlXXyCVZArwB+FAzHzraXgs9INouBzLyN02jgM8mubW5pMi4eV5VfauZ/j/A80ZZzID1Se5shqDmfOjrgCRLgZfQ++tzbLbXQF0w4u3VDJfcATwEbKO3V/+dqtrfdBnJ+3Kwrqo6sL3+uNleG5srUs+1PwN+F3iqmT+ZjrbXQg+IcfaqqjoLOA94a5JzRl3QoVRvv3Ys/roC/iPws8CLgW8BfzqKIpKcAPwF8K+q6rv9y0a5vVrqGvn2qqonq+rF9K6YsBL4+bmuoc1gXUn+PvAOevWdDZwE/N5c1pTkl4CHqurWuXi9hR4QY3tJj6ra2/x8CPgkvTfOOPnrJM8HaH4+NOJ6AKiqv27e2E8BH2QE2y3JsfQ+hP9zVX2iaR759mqraxy21wFV9R3gC8ArgBOby+/AiN+XfXWtaobqqnpXmv5z5n57vRI4P8n99IbEX0PvnjudbK+FHhDDXA5kziV5VpKfODANvA64e/q15lz/ZVIuAv7rCGv5oQMfwo1fYY63WzMefDVwb1W9t2/RSLfXoeoag+01keTEZvoZ9O4fcy+9D+Q1TbdRbK+2ur7WF/KhN84/p9urqt5RVUuqaim9z6ubq+otdLW9Rn00ftQP4PX0zuj4BvD7o66nqel0emdUfRXYMeq6gP9Cb/jhB/TGNy+hN+75eeDrwOeAk8akruuAu4A76X0oP3+Oa3oVveGjO4E7msfrR729pqlr1NvrRcDtzevfDVzWtJ9O7/pru4CPA8ePSV03N9vrbuB6mjOdRvEAfoH/fxZTJ9vLS21Iklot9CEmSdIhGBCSpFYGhCSplQEhSWplQEiSWhkQkqRWBoQkqdX/Azrrsvll2nmZAAAAAElFTkSuQmCC\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "plt.clf()\n",
+    "xmean.plot()\n",
+    "x.plot()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8b739a1e-9583-40bc-baad-1684377a0eb1",
+   "metadata": {},
+   "source": [
+    "3. WHAT DO YOU SEE? HOW THE HISTOGRAM OF X DIFFERS FROM THE HISTOGRAM OF THE SAMPLES OF X?\n",
+    "\n",
+    "The most obvious difference is the shape of the distribution, from which it can be concluded that the orange one is a uniform probability distribution while the blue one appears to be a normal distribution.\n",
+    "\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "1732708b-c503-4fa3-adbd-c6bde4b29006",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# clear the plot space:\n",
+    "plt.clf()\n",
+    "# Define the probability type of function as uniform (probability space)\n",
+    "P = Normal(mean=20, sd=10)\n",
+    "# Define Y as a random variable of the type P (normal)\n",
+    "Y =RV(P)\n",
+    "# Simulate 10,000 values of Y and save the in the x array: \n",
+    "y=Y.sim(10000)\n",
+    "y.plot()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f2cc90c9-915e-4e86-b91d-2d6fbd398ddb",
+   "metadata": {},
+   "source": [
+    "# CHALLENGE\n",
+    "\n",
+    "1. CALCULATE THE MEAN AND STANDARD DEVIATION OF THIS RANDOM y VARIABLE. HOW SIMILAR OR DIFFERENT ARE THESE VALUES FROM THE MEAN AND STANDARD DEVIATION OF THE THEORETICAL MEAN (20) AND THE THEORETICAL STANDARD DEVIATION (10)?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "d14d3a9a-dfe5-401d-9efb-a18c90e4a822",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "20.136964858821894 10.012835535652686\n"
+     ]
+    }
+   ],
+   "source": [
+    "y_mu = y.mean()\n",
+    "y_std = y.std()\n",
+    "\n",
+    "print(y_mu, y_std)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6821c2d4-d442-42a4-88f7-b966af01b7f2",
+   "metadata": {},
+   "source": [
+    "The values are really close to the theoretical values.\n",
+    "\n",
+    "2. WHAT DO YOU SEE? INTERPRET THE HISTOGRAM WITH YOUR WORDS.\n",
+    "\n",
+    "What I see is that the histogram represents a normal distribution with $\\mu = 20$ and $\\sigma = 10$. It must have $\\mu = 20$ because most values are centered towards 20.\n",
+    "\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "ab9f2413-72e0-4a17-9aed-ad413e0a8abd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Define the probability space P as a vector of 25 normal random numbers:\n",
+    "P = Normal(mean=20, sd=10) ** 25\n",
+    "# Define RANDOMVECTOR as a vector of 25 random variables in the Probability space P \n",
+    "RANDOMVECTOR = RV(P)\n",
+    "# Simulate 10,000 random vectors with this distribution and save the in ymatrix: \n",
+    "ymatrix=RANDOMVECTOR.sim(10000)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "7e0ae922-9ccb-403d-b597-3eadd5a5b126",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "\n",
+       "    <table>\n",
+       "      <thead>\n",
+       "        <th width=\"10%\">Index</th>\n",
+       "        <th width=\"90%\">Result</th>\n",
+       "      </thead>\n",
+       "      <tbody>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>0</td><td>(28.138707610138887, 22.476109071009965, 41.0692154612947, 21.363352147925493, 43.80619076701926, .....</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>1</td><td>(31.979357030511544, 31.333734019493406, 33.452363076981825, 23.005859017928636, 22.498238486814337,...</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>2</td><td>(0.9773592080863338, 9.84190067394411, 12.92495667475675, 24.90370037241773, 23.09266612729767, ...,...</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>3</td><td>(26.611453932740105, 4.624281613479042, 25.566245064657497, 22.266349015569553, 19.897380559482826, ...</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>4</td><td>(25.547512021915747, -3.0452075317885843, 24.019491415227975, 16.200492448721047, 19.802586940027354...</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>5</td><td>(20.651231918954167, 18.761532561140218, 23.003706198764014, 40.21546890548129, 15.424411596186811, ...</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>6</td><td>(27.640080688866227, 17.54079414217619, 26.838446647388725, 11.940686686215848, 17.966491815969505, ...</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>7</td><td>(35.103331739441046, 17.332672566008956, 10.053602320279998, 38.98780617392356, -0.37914925773115016...</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>8</td><td>(7.612874484410057, 18.529350816158765, 27.534128020850915, 6.118210506670225, 19.870377889378506, ....</td>\n",
+       "        </tr>\n",
+       "        <tr><td>...</td><td>...</td></tr>\n",
+       "        <tr>\n",
+       "          <td>9999</td><td>(20.650056472159832, -0.9996929799900123, 11.661195544766372, 21.963325603921334, 15.449762739745214...</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "      </tbody>\n",
+       "    </table>\n",
+       "        "
+      ],
+      "text/plain": [
+       "Index Result\n",
+       "0     (28.138707610138887, 22.476109071009965, 41.0692154612947, 21.363352147925493, 43.80619076701926, ..., 12.72076464843964)\n",
+       "1     (31.979357030511544, 31.333734019493406, 33.452363076981825, 23.005859017928636, 22.498238486814337, ..., 5.810651681365249)\n",
+       "2     (0.9773592080863338, 9.84190067394411, 12.92495667475675, 24.90370037241773, 23.09266612729767, ..., 22.267757981592418)\n",
+       "3     (26.611453932740105, 4.624281613479042, 25.566245064657497, 22.266349015569553, 19.897380559482826, ..., 28.09618650248806)\n",
+       "4     (25.547512021915747, -3.0452075317885843, 24.019491415227975, 16.200492448721047, 19.802586940027354, ..., 8.747389760389652)\n",
+       "5     (20.651231918954167, 18.761532561140218, 23.003706198764014, 40.21546890548129, 15.424411596186811, ..., 34.582612714080895)\n",
+       "6     (27.640080688866227, 17.54079414217619, 26.838446647388725, 11.940686686215848, 17.966491815969505, ..., 23.067411098429034)\n",
+       "7     (35.103331739441046, 17.332672566008956, 10.053602320279998, 38.98780617392356, -0.37914925773115016, ..., -5.7377336999588735)\n",
+       "8     (7.612874484410057, 18.529350816158765, 27.534128020850915, 6.118210506670225, 19.870377889378506, ..., 20.6983766639239)\n",
+       "....  .............................................................................................................................\n",
+       "9999  (20.650056472159832, -0.9996929799900123, 11.661195544766372, 21.963325603921334, 15.449762739745214, ..., 6.151623182337673)"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ymatrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "706a7f7f-fcb7-4b9b-ba7f-c43b980d4cb3",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "\n",
+       "    <table>\n",
+       "      <thead>\n",
+       "        <th width=\"10%\">Index</th>\n",
+       "        <th width=\"90%\">Result</th>\n",
+       "      </thead>\n",
+       "      <tbody>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>0</td><td>22.02473693953173</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>1</td><td>19.20085396385214</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>2</td><td>16.111386733718753</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>3</td><td>22.883501152833954</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>4</td><td>23.50767442383423</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>5</td><td>18.456673821446998</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>6</td><td>20.115895976541804</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>7</td><td>18.102135096544444</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "        <tr>\n",
+       "          <td>8</td><td>20.420627646082895</td>\n",
+       "        </tr>\n",
+       "        <tr><td>...</td><td>...</td></tr>\n",
+       "        <tr>\n",
+       "          <td>9999</td><td>19.312102884274175</td>\n",
+       "        </tr>\n",
+       "        \n",
+       "      </tbody>\n",
+       "    </table>\n",
+       "        "
+      ],
+      "text/plain": [
+       "Index Result\n",
+       "0     22.02473693953173\n",
+       "1     19.20085396385214\n",
+       "2     16.111386733718753\n",
+       "3     22.883501152833954\n",
+       "4     23.50767442383423\n",
+       "5     18.456673821446998\n",
+       "6     20.115895976541804\n",
+       "7     18.102135096544444\n",
+       "8     20.420627646082895\n",
+       "....  ..................\n",
+       "9999  19.312102884274175"
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# The 2nd parameter is the mathematical operation applied to each row of the random vector\n",
+    "# Simulate 10,000 means of each random vector of 25 uniform distributed numbers: \n",
+    "ymean = RV(P,mean).sim(10000)\n",
+    "ymean"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "ccc792fc-ea89-4d72-bbf7-57529beb4293",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "plt.clf()\n",
+    "ymean.plot()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "07a31713-cee1-4fff-84c8-97ef18bd1cce",
+   "metadata": {},
+   "source": [
+    "# CHALLENGE\n",
+    "\n",
+    "1. CALCULATE THE MEAN AND STANDARD DEVIATION OF THE ymean VARIABLE. HOW SIMILAR OR DIFFERENT ARE THESE VALUES FROM THE MEAN AND STANDARD DEVIATION OF y?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "588aba0a-9e67-4841-af33-8922918323ba",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "20.012548417645274 1.9957225796984397\n",
+      "20.136964858821894 10.012835535652686\n"
+     ]
+    }
+   ],
+   "source": [
+    "ymean_mu = ymean.mean()\n",
+    "ymean_std = ymean.std()\n",
+    "\n",
+    "print(ymean_mu, ymean_std)\n",
+    "print(y_mu, y_std)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d601bd2f-5710-4603-8ddc-ec6e5ed2bfd0",
+   "metadata": {},
+   "source": [
+    "The values from the mean remain roughly equal, while the values from the standard deviation differ by a factor of more than 4."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e452856c-211d-4a13-8962-01667937064e",
+   "metadata": {},
+   "source": [
+    "2. INTERPRET THE ABOVE HISTOGRAM OF THE SAMPLES OF y.\n",
+    "\n",
+    "It is the histogram of a normal distribution with $\\mu = 20$ and $\\sigma \\approx 2$."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "121004aa-c5d3-4224-884b-378abd452f87",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "plt.clf()\n",
+    "ymean.plot()\n",
+    "y.plot()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0f46ce80-6dd9-487d-abfb-4970156927ff",
+   "metadata": {},
+   "source": [
+    "3. WHAT DO YOU SEE? COMPARE BOTH HISTOGRAMS. BRIEFLY EXPLAIN WHAT YOU THINK THAT HAPPEND.\n",
+    "\n",
+    "Because `ymean` has a lower standard deviation, its plot has a lower height and a broader range. Furthermore, its density is more evenly distributed than in the plot of `y`.\n",
+    "\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "91ce5d0c-5a54-4d88-8073-ec965e616792",
+   "metadata": {},
+   "source": [
+    "# CHALLENGE\n",
+    "\n",
+    "Collect real data for Microsoft (MSFT) stock and do a hypothesis testing to see whether the mean of monthly cc returns of Microsoft is greater than zero."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "b95ab478-ba2a-43f3-b305-a934ffffef3c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import pandas_datareader as pdr"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "24913c1e-20cd-4c38-b4cb-17a1b0916900",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "MSFT = pdr.get_data_yahoo(\n",
+    "    'MSFT',\n",
+    "    start = \"08/15/2000\",\n",
+    "    end = \"08/15/2022\",\n",
+    "    interval=\"m\"\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "91d76bba-9d00-4b54-a0dd-879508fefa23",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>High</th>\n",
+       "      <th>Low</th>\n",
+       "      <th>Open</th>\n",
+       "      <th>Close</th>\n",
+       "      <th>Volume</th>\n",
+       "      <th>Adj Close</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Date</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2000-09-01</th>\n",
+       "      <td>36.031250</td>\n",
+       "      <td>29.312500</td>\n",
+       "      <td>35.000000</td>\n",
+       "      <td>30.156250</td>\n",
+       "      <td>1.425534e+09</td>\n",
+       "      <td>18.954859</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2000-10-01</th>\n",
+       "      <td>35.062500</td>\n",
+       "      <td>24.218750</td>\n",
+       "      <td>30.250000</td>\n",
+       "      <td>34.437500</td>\n",
+       "      <td>2.469416e+09</td>\n",
+       "      <td>21.645863</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2000-11-01</th>\n",
+       "      <td>36.187500</td>\n",
+       "      <td>28.500000</td>\n",
+       "      <td>34.250000</td>\n",
+       "      <td>28.687500</td>\n",
+       "      <td>1.983463e+09</td>\n",
+       "      <td>18.031670</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2000-12-01</th>\n",
+       "      <td>30.312500</td>\n",
+       "      <td>20.156250</td>\n",
+       "      <td>29.031250</td>\n",
+       "      <td>21.687500</td>\n",
+       "      <td>2.056668e+09</td>\n",
+       "      <td>13.631783</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2001-01-01</th>\n",
+       "      <td>32.375000</td>\n",
+       "      <td>21.437500</td>\n",
+       "      <td>22.062500</td>\n",
+       "      <td>30.531250</td>\n",
+       "      <td>2.005531e+09</td>\n",
+       "      <td>19.190571</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-05-01</th>\n",
+       "      <td>290.880005</td>\n",
+       "      <td>246.440002</td>\n",
+       "      <td>277.709991</td>\n",
+       "      <td>271.869995</td>\n",
+       "      <td>7.429020e+08</td>\n",
+       "      <td>271.238251</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-06-01</th>\n",
+       "      <td>277.690002</td>\n",
+       "      <td>241.509995</td>\n",
+       "      <td>275.200012</td>\n",
+       "      <td>256.829987</td>\n",
+       "      <td>6.213723e+08</td>\n",
+       "      <td>256.829987</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-07-01</th>\n",
+       "      <td>282.000000</td>\n",
+       "      <td>245.940002</td>\n",
+       "      <td>256.390015</td>\n",
+       "      <td>280.739990</td>\n",
+       "      <td>5.348684e+08</td>\n",
+       "      <td>280.739990</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-08-01</th>\n",
+       "      <td>291.910004</td>\n",
+       "      <td>272.380005</td>\n",
+       "      <td>277.820007</td>\n",
+       "      <td>291.910004</td>\n",
+       "      <td>2.121793e+08</td>\n",
+       "      <td>291.910004</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-08-15</th>\n",
+       "      <td>292.679901</td>\n",
+       "      <td>290.130005</td>\n",
+       "      <td>291.000000</td>\n",
+       "      <td>291.105011</td>\n",
+       "      <td>6.295264e+06</td>\n",
+       "      <td>291.105011</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>265 rows × 6 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                  High         Low        Open       Close        Volume  \\\n",
+       "Date                                                                       \n",
+       "2000-09-01   36.031250   29.312500   35.000000   30.156250  1.425534e+09   \n",
+       "2000-10-01   35.062500   24.218750   30.250000   34.437500  2.469416e+09   \n",
+       "2000-11-01   36.187500   28.500000   34.250000   28.687500  1.983463e+09   \n",
+       "2000-12-01   30.312500   20.156250   29.031250   21.687500  2.056668e+09   \n",
+       "2001-01-01   32.375000   21.437500   22.062500   30.531250  2.005531e+09   \n",
+       "...                ...         ...         ...         ...           ...   \n",
+       "2022-05-01  290.880005  246.440002  277.709991  271.869995  7.429020e+08   \n",
+       "2022-06-01  277.690002  241.509995  275.200012  256.829987  6.213723e+08   \n",
+       "2022-07-01  282.000000  245.940002  256.390015  280.739990  5.348684e+08   \n",
+       "2022-08-01  291.910004  272.380005  277.820007  291.910004  2.121793e+08   \n",
+       "2022-08-15  292.679901  290.130005  291.000000  291.105011  6.295264e+06   \n",
+       "\n",
+       "             Adj Close  \n",
+       "Date                    \n",
+       "2000-09-01   18.954859  \n",
+       "2000-10-01   21.645863  \n",
+       "2000-11-01   18.031670  \n",
+       "2000-12-01   13.631783  \n",
+       "2001-01-01   19.190571  \n",
+       "...                ...  \n",
+       "2022-05-01  271.238251  \n",
+       "2022-06-01  256.829987  \n",
+       "2022-07-01  280.739990  \n",
+       "2022-08-01  291.910004  \n",
+       "2022-08-15  291.105011  \n",
+       "\n",
+       "[265 rows x 6 columns]"
+      ]
+     },
+     "execution_count": 29,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "MSFT"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "60233157-4f75-4d00-87ce-d58e3e5fac37",
+   "metadata": {},
+   "source": [
+    "1. DEFINE THE VARIABLE OF STUDY. In this case it will be the mean of MSFT cc returns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "50b8df8a-799e-4382-a5a9-c1b63e06a5fd",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Date\n",
+       "2000-09-01         NaN\n",
+       "2000-10-01    0.141969\n",
+       "2000-11-01   -0.166969\n",
+       "2000-12-01   -0.244009\n",
+       "2001-01-01    0.407781\n",
+       "                ...   \n",
+       "2022-05-01   -0.020359\n",
+       "2022-06-01   -0.055321\n",
+       "2022-07-01    0.093097\n",
+       "2022-08-01    0.039788\n",
+       "2022-08-15   -0.002758\n",
+       "Name: R, Length: 265, dtype: float64"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "MSFT[\"R\"] = (MSFT[\"Close\"] / MSFT[\"Close\"].shift(1)) - 1\n",
+    "MSFT[\"R\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "d9ed8e0f-928c-4e7b-9cfd-b5fbc1c399d7",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>High</th>\n",
+       "      <th>Low</th>\n",
+       "      <th>Open</th>\n",
+       "      <th>Close</th>\n",
+       "      <th>Volume</th>\n",
+       "      <th>Adj Close</th>\n",
+       "      <th>R</th>\n",
+       "      <th>r</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Date</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2000-10-01</th>\n",
+       "      <td>35.062500</td>\n",
+       "      <td>24.218750</td>\n",
+       "      <td>30.250000</td>\n",
+       "      <td>34.437500</td>\n",
+       "      <td>2.469416e+09</td>\n",
+       "      <td>21.645863</td>\n",
+       "      <td>0.141969</td>\n",
+       "      <td>0.132754</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2000-11-01</th>\n",
+       "      <td>36.187500</td>\n",
+       "      <td>28.500000</td>\n",
+       "      <td>34.250000</td>\n",
+       "      <td>28.687500</td>\n",
+       "      <td>1.983463e+09</td>\n",
+       "      <td>18.031670</td>\n",
+       "      <td>-0.166969</td>\n",
+       "      <td>-0.182685</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2000-12-01</th>\n",
+       "      <td>30.312500</td>\n",
+       "      <td>20.156250</td>\n",
+       "      <td>29.031250</td>\n",
+       "      <td>21.687500</td>\n",
+       "      <td>2.056668e+09</td>\n",
+       "      <td>13.631783</td>\n",
+       "      <td>-0.244009</td>\n",
+       "      <td>-0.279726</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2001-01-01</th>\n",
+       "      <td>32.375000</td>\n",
+       "      <td>21.437500</td>\n",
+       "      <td>22.062500</td>\n",
+       "      <td>30.531250</td>\n",
+       "      <td>2.005531e+09</td>\n",
+       "      <td>19.190571</td>\n",
+       "      <td>0.407781</td>\n",
+       "      <td>0.342015</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2001-02-01</th>\n",
+       "      <td>32.531250</td>\n",
+       "      <td>26.937500</td>\n",
+       "      <td>30.406250</td>\n",
+       "      <td>29.500000</td>\n",
+       "      <td>1.536896e+09</td>\n",
+       "      <td>18.542374</td>\n",
+       "      <td>-0.033777</td>\n",
+       "      <td>-0.034360</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-05-01</th>\n",
+       "      <td>290.880005</td>\n",
+       "      <td>246.440002</td>\n",
+       "      <td>277.709991</td>\n",
+       "      <td>271.869995</td>\n",
+       "      <td>7.429020e+08</td>\n",
+       "      <td>271.238251</td>\n",
+       "      <td>-0.020359</td>\n",
+       "      <td>-0.020569</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-06-01</th>\n",
+       "      <td>277.690002</td>\n",
+       "      <td>241.509995</td>\n",
+       "      <td>275.200012</td>\n",
+       "      <td>256.829987</td>\n",
+       "      <td>6.213723e+08</td>\n",
+       "      <td>256.829987</td>\n",
+       "      <td>-0.055321</td>\n",
+       "      <td>-0.054583</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-07-01</th>\n",
+       "      <td>282.000000</td>\n",
+       "      <td>245.940002</td>\n",
+       "      <td>256.390015</td>\n",
+       "      <td>280.739990</td>\n",
+       "      <td>5.348684e+08</td>\n",
+       "      <td>280.739990</td>\n",
+       "      <td>0.093097</td>\n",
+       "      <td>0.089015</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-08-01</th>\n",
+       "      <td>291.910004</td>\n",
+       "      <td>272.380005</td>\n",
+       "      <td>277.820007</td>\n",
+       "      <td>291.910004</td>\n",
+       "      <td>2.121793e+08</td>\n",
+       "      <td>291.910004</td>\n",
+       "      <td>0.039788</td>\n",
+       "      <td>0.039017</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2022-08-15</th>\n",
+       "      <td>292.679901</td>\n",
+       "      <td>290.130005</td>\n",
+       "      <td>291.000000</td>\n",
+       "      <td>291.105011</td>\n",
+       "      <td>6.295264e+06</td>\n",
+       "      <td>291.105011</td>\n",
+       "      <td>-0.002758</td>\n",
+       "      <td>-0.002761</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>264 rows × 8 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                  High         Low        Open       Close        Volume  \\\n",
+       "Date                                                                       \n",
+       "2000-10-01   35.062500   24.218750   30.250000   34.437500  2.469416e+09   \n",
+       "2000-11-01   36.187500   28.500000   34.250000   28.687500  1.983463e+09   \n",
+       "2000-12-01   30.312500   20.156250   29.031250   21.687500  2.056668e+09   \n",
+       "2001-01-01   32.375000   21.437500   22.062500   30.531250  2.005531e+09   \n",
+       "2001-02-01   32.531250   26.937500   30.406250   29.500000  1.536896e+09   \n",
+       "...                ...         ...         ...         ...           ...   \n",
+       "2022-05-01  290.880005  246.440002  277.709991  271.869995  7.429020e+08   \n",
+       "2022-06-01  277.690002  241.509995  275.200012  256.829987  6.213723e+08   \n",
+       "2022-07-01  282.000000  245.940002  256.390015  280.739990  5.348684e+08   \n",
+       "2022-08-01  291.910004  272.380005  277.820007  291.910004  2.121793e+08   \n",
+       "2022-08-15  292.679901  290.130005  291.000000  291.105011  6.295264e+06   \n",
+       "\n",
+       "             Adj Close         R         r  \n",
+       "Date                                        \n",
+       "2000-10-01   21.645863  0.141969  0.132754  \n",
+       "2000-11-01   18.031670 -0.166969 -0.182685  \n",
+       "2000-12-01   13.631783 -0.244009 -0.279726  \n",
+       "2001-01-01   19.190571  0.407781  0.342015  \n",
+       "2001-02-01   18.542374 -0.033777 -0.034360  \n",
+       "...                ...       ...       ...  \n",
+       "2022-05-01  271.238251 -0.020359 -0.020569  \n",
+       "2022-06-01  256.829987 -0.055321 -0.054583  \n",
+       "2022-07-01  280.739990  0.093097  0.089015  \n",
+       "2022-08-01  291.910004  0.039788  0.039017  \n",
+       "2022-08-15  291.105011 -0.002758 -0.002761  \n",
+       "\n",
+       "[264 rows x 8 columns]"
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "MSFT[\"r\"] = np.log(MSFT[\"Adj Close\"]) \\\n",
+    "    - np.log(MSFT[\"Adj Close\"].shift(1))\n",
+    "MSFTR = MSFT[[\"R\",\"r\"]].copy()\n",
+    "MSFT.dropna()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "403cd915-612e-4da0-8970-55052221f13c",
+   "metadata": {},
+   "source": [
+    "2. WRITE THE NULL AND THE ALTERNATIVE HYPOTHESIS.\n",
+    "\n",
+    "* $H_0$: The mean of monthly cc returns of Microsoft is less than or equal to 0.\n",
+    "* $H_a$: The mean of monthly cc returns of Microsoft is greater than 0."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7b4e3300-d438-4803-9eab-d84477434d7c",
+   "metadata": {},
+   "source": [
+    "3. CALCULATE THE STANDARD ERROR, WHICH IS THE STANDARD DEVIATION OF THE VARIABLE OF STUDY."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "id": "732aed99-ccf1-479f-9a48-80c8d8e02f41",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.004571315492693198"
+      ]
+     },
+     "execution_count": 32,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "MONTHS = MSFT[\"r\"].count()\n",
+    "msft_std = MSFT[\"r\"].std() / np.sqrt(MONTHS)\n",
+    "msft_std"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fee5c402-eaf3-4d2f-a424-68eac27abf88",
+   "metadata": {},
+   "source": [
+    "4. CALCULATE THE t-statistic (t-value). EXPLAIN/INTERPRET THE t-statistic."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "0242bfa4-d1ff-46b5-9ade-6f8188ce6700",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "2.2634753028769015"
+      ]
+     },
+     "execution_count": 33,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "msft_mu = MSFT[\"r\"].mean()\n",
+    "tstat = msft_mu / msft_std\n",
+    "tstat"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "74be745f-a3a1-4e70-977a-232d924b6264",
+   "metadata": {},
+   "source": [
+    "5. CALCULATE THE 95% CONFIDENCE INTERVAL OF THE SAMPLE MEAN"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "id": "e6e5dcf5-015a-476b-a11e-b8a610d2d42f",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.12044287339832115% 1.9489690704756004%\n"
+     ]
+    }
+   ],
+   "source": [
+    "rmin95 = msft_mu - 2 * msft_std\n",
+    "rmax95 = msft_mu + 2 * msft_std\n",
+    "\n",
+    "f_rmin95 = str(rmin95 * 100) + '%'\n",
+    "f_rmax95 = str(rmax95 * 100) + '%'\n",
+    "\n",
+    "print(f_rmin95, f_rmax95)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6a3149b7-acc1-4838-8a14-e28568c584e3",
+   "metadata": {},
+   "source": [
+    "6. WRITE YOUR CONCLUSION OF THE t-TEST\n",
+    "\n",
+    "Since the mean of monthly cc returns of Microsoft is greater than 0, $H_a$ is true with a confidence interval of 95%."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
